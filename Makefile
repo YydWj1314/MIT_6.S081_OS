@@ -115,6 +115,15 @@ CFLAGS += -DKCSAN
 KCSANFLAG = -fsanitize=thread
 endif
 
+ifeq ($(LAB),net)
+CFLAGS += -DNET_TESTS_PORT=$(SERVERPORT)
+endif
+
+ifdef KCSAN
+CFLAGS += -DKCSAN
+KCSANFLAG = -fsanitize=thread
+endif
+
 # Disable PIE when possible (for Ubuntu 16.10 toolchain)
 ifneq ($(shell $(CC) -dumpspecs 2>/dev/null | grep -e '[^f]no-pie'),)
 CFLAGS += -fno-pie -no-pie
@@ -194,11 +203,7 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
-        $U/_sleep\
-        $U/_pingpong\
-        $U/_primes\
-        $U/_find\
-        $U/_xargs\
+	$U/_trace\
 
 
 
@@ -207,6 +212,7 @@ ifeq ($(LAB),$(filter $(LAB), pgtbl lock))
 UPROGS += \
 	$U/_stats
 endif
+
 
 ifeq ($(LAB),traps)
 UPROGS += \
@@ -218,6 +224,7 @@ ifeq ($(LAB),lazy)
 UPROGS += \
 	$U/_lazytests
 endif
+
 
 ifeq ($(LAB),cow)
 UPROGS += \
