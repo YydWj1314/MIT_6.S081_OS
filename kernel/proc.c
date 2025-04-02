@@ -164,6 +164,7 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  p->mask = 0;
 }
 
 // Create a user page table for a given process,
@@ -273,8 +274,8 @@ int
 fork(void)
 {
   int i, pid;
-  struct proc *np;
-  struct proc *p = myproc();
+  struct proc *np;	// parent
+  struct proc *p = myproc(); // child
 
   // Allocate process.
   if((np = allocproc()) == 0){
@@ -288,10 +289,13 @@ fork(void)
     return -1;
   }
   np->sz = p->sz;
-
+ 
   // copy saved user registers.
   *(np->trapframe) = *(p->trapframe);
 
+  // copy mask 
+  np->mask = p->mask;
+  
   // Cause fork to return 0 in the child.
   np->trapframe->a0 = 0;
 
@@ -300,7 +304,7 @@ fork(void)
     if(p->ofile[i])
       np->ofile[i] = filedup(p->ofile[i]);
   np->cwd = idup(p->cwd);
-
+ 
   safestrcpy(np->name, p->name, sizeof(p->name));
 
   pid = np->pid;
