@@ -12,7 +12,7 @@ int sieve(int fd_read){
 		exit(0);
 	}
 	
-	printf("%d\n", p);
+	printf("prime %d\n", p);
 	
 	int pip_next[2];
 	pipe(pip_next);

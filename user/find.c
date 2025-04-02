@@ -8,7 +8,7 @@ void find(char* dir_path, char* file_name){
 	struct dirent de;
 	int fd;
 
-	printf("=== find in dir: %s\n ===", dir_path);
+	// printf("=== find in dir: %s\n ===", dir_path);
 
 	fd = open(dir_path, 0);
 	if(fd < 0){
