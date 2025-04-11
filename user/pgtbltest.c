@@ -57,7 +57,7 @@ pgaccess_test()
   testname = "pgaccess_test";
   buf = malloc(32 * PGSIZE);
   if (pgaccess(buf, 32, &abits) < 0)
-    err("pgaccess failed");
+	  err("pgaccess failed");
   buf[PGSIZE * 1] += 1;
   buf[PGSIZE * 2] += 1;
   buf[PGSIZE * 30] += 1;

@@ -80,8 +80,40 @@ sys_sleep(void)
 int
 sys_pgaccess(void)
 {
-  // lab pgtbl: your code here.
-  return 0;
+   // lab pgtbl: your code here.
+    int pageNum; // number of pages to check
+    uint64 addr; // starting virtual addr of first user page to check
+    uint64 bitmask; // a pointer to datastructure to store result
+
+    unsigned int bbits = 0; // buffer bits store the res and copy to userspace 
+   
+    if(argaddr(0, &addr) < 0) return -1; 
+    if(argint(1, &pageNum) < 0) return -1;
+    if(argaddr(2, &bitmask) < 0) return -1;
+   
+   
+    printf("pageNum: %d\n", pageNum);
+    printf("bitmask: 0x%p\n", (void*)bitmask);
+    struct proc *p = myproc();  // get current process state info
+    for(int i = 0; i < pageNum; i++){
+        pte_t *pte = walk(p->pagetable, addr + i * PGSIZE, 0);
+        if(pte && (*pte & PTE_V)){
+            if(*pte & PTE_A){
+                int mbits = (1U << i);
+		//printf("mbits: 0x%x\n", mbits);
+		bbits |= mbits;
+                // printf("bbits: 0x%x\n", bbits);
+                *pte = *pte & (~PTE_A); // clear PTE_A after checking 
+            }
+        }
+    }
+    // copy buffer bits to bitmask 
+    printf("[kernel] bitmask user addr: 0x%p\n", bitmask);
+    if(copyout(p->pagetable, bitmask, (char *)&bbits, sizeof(bbits)) < 0 )
+        return -1;
+
+    return 0;
+	
 }
 #endif
 
@@ -107,3 +139,5 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+
